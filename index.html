@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[ 러브레터 작성 도움! ]</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Gaegu:wght@400;700&display=swap');
+
+:root{
+  --red:#b84c5b;
+  --deep-red:#8f3445;
+  --green:#456b59;
+  --cream:#fffaf0;
+  --paper:#fffdf7;
+  --gold:#d7a94b;
+  --ink:#594d49;
+  --snow:#ffffff;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:'Gowun Dodum',sans-serif;color:var(--ink)}
+body{
+  background:
+    radial-gradient(circle at 12% 18%,rgba(255,255,255,.95) 0 3px,transparent 4px),
+    radial-gradient(circle at 88% 26%,rgba(255,255,255,.9) 0 2px,transparent 4px),
+    linear-gradient(180deg,#cfe4eb 0%,#e7f1f1 42%,#faf4e7 100%);
+  background-size:190px 170px,250px 210px,100% 100%;
+  overflow-x:hidden;
+}
+a{color:inherit}
+.snowflake{
+  position:fixed;top:-30px;z-index:20;color:white;pointer-events:none;
+  text-shadow:0 1px 3px rgba(80,110,120,.15);
+  animation:fall linear infinite;
+  opacity:.9;
+}
+@keyframes fall{to{transform:translate3d(30px,110vh,0) rotate(180deg)}}
+.wrapper{width:min(920px,calc(100% - 28px));margin:0 auto;padding:30px 0 55px}
+.header{text-align:center;padding:18px 0 10px;position:relative}
+.small-title{font-size:14px;letter-spacing:3px;color:var(--green);font-weight:bold}
+h1{
+  margin:5px 0 2px;font-family:'Gaegu',cursive;font-size:clamp(44px,8vw,72px);
+  line-height:1;color:var(--red);font-weight:700;
+  text-shadow:2px 3px 0 #fff, 0 0 18px rgba(255,255,255,.75);
+  letter-spacing:1px;
+}
+.subtitle{font-size:15px;color:#7b716c;margin-top:7px}
+.reindeer{
+  font-size:52px;display:inline-block;margin-bottom:-4px;
+  animation:bob 2.5s ease-in-out infinite;
+}
+@keyframes bob{50%{transform:translateY(-5px) rotate(-2deg)}}
+.card{
+  position:relative;background:
+    linear-gradient(rgba(255,255,255,.78),rgba(255,255,255,.78)),
+    repeating-linear-gradient(0deg,transparent 0 31px,rgba(190,177,157,.12) 32px);
+  border:2px solid #e2d0b4;border-radius:18px;
+  box-shadow:0 18px 45px rgba(83,74,62,.16);
+}
+.card:after{
+  content:"";position:absolute;inset:0;border-radius:16px;pointer-events:none;
+  box-shadow:inset 0 0 0 6px rgba(255,255,255,.65),inset 0 0 35px rgba(176,143,104,.08);
+}
+.card:before{
+  content:"";position:absolute;inset:7px;border:1px dashed #d9cbb8;border-radius:6px;
+  pointer-events:none;
+}
+.letter{padding:35px 40px 30px;min-height:430px}
+.letter-top{
+  display:flex;justify-content:space-between;align-items:center;
+  color:#9a8a7d;font-size:13px;position:relative;z-index:1
+}
+.stamp{
+  width:55px;height:55px;border:2px dashed var(--red);border-radius:8px;
+  display:grid;place-items:center;background:#fff5f3;transform:rotate(3deg);font-size:25px
+}
+.instructions{text-align:center;margin:16px 0 26px;position:relative;z-index:1}
+.instructions strong{font-family:'Gaegu';font-size:27px;color:var(--green)}
+.instructions p{margin:4px 0;color:#8d8178;font-size:14px}
+.sentences{position:relative;z-index:1;margin:0 auto 28px;max-width:760px}
+.empty{
+  text-align:center;padding:50px 15px;color:#a89c93;
+  font-family:'Gaegu';font-size:24px
+}
+.line{
+  display:flex;gap:14px;align-items:flex-start;padding:14px 8px;
+  border-bottom:1px dotted #d9cec2;animation:appear .45s ease both;
+}
+@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.num{
+  flex:0 0 29px;height:29px;border-radius:50%;background:#e9f1e9;color:var(--green);
+  display:grid;place-items:center;font-size:13px;font-weight:bold;margin-top:1px
+}
+.text{font-size:17px;line-height:1.75;flex:1}
+.author{font-size:12px;color:#a39489;white-space:nowrap;margin-top:7px}
+.form-wrap{
+  position:relative;z-index:1;background:#f8f3e9;border-radius:9px;padding:20px;
+  border:1px solid #eadfce
+}
+.form-title{font-family:'Gaegu';font-size:26px;color:var(--deep-red);margin:0 0 10px}
+.inputs{display:flex;gap:10px}
+input,textarea{
+  font:inherit;border:1px solid #ddcfc0;background:#fffdf9;border-radius:7px;
+  color:var(--ink);outline:none;transition:.2s;
+}
+input:focus,textarea:focus{border-color:#bfa083;box-shadow:0 0 0 3px rgba(215,169,75,.12)}
+input{width:150px;padding:11px 12px}
+textarea{width:100%;min-height:95px;padding:12px;resize:vertical;line-height:1.6}
+textarea::placeholder,input::placeholder{color:#b8aaa0}
+.submit-row{display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:10px}
+.counter{font-size:12px;color:#a09187}
+button{
+  border:0;border-radius:999px;padding:11px 20px;font:700 16px 'Gaegu',cursive;
+  cursor:pointer;background:var(--red);color:#fff;box-shadow:0 4px 0 #8e3947;
+  transition:transform .12s,box-shadow .12s
+}
+button:hover{transform:translateY(-2px);box-shadow:0 6px 0 #8e3947}
+button:active{transform:translateY(2px);box-shadow:0 2px 0 #8e3947}
+button:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:0 3px 0 #999}
+.footer{text-align:center;margin-top:25px;color:#8e8179;font-size:12px}
+.tree{font-size:23px;letter-spacing:3px;margin-top:7px}
+.notice{
+  display:none;margin-top:12px;padding:9px 12px;border-radius:7px;
+  background:#fff0ed;color:#9b5058;font-size:12px
+}
+@media(max-width:620px){
+  .wrapper{width:calc(100% - 18px);padding-top:15px}
+  .letter{padding:25px 18px 22px}
+  .inputs{flex-direction:column}
+  input{width:100%}
+  .text{font-size:15px}
+  .author{font-size:11px}
+  .letter-top{padding:0 5px}
+  .form-wrap{padding:15px}
+}
+
+.story-ornament{
+  position:absolute;left:50%;transform:translateX(-50%);
+  bottom:-15px;font-size:18px;letter-spacing:7px;color:#c28b55;
+  text-shadow:0 1px 0 white;z-index:2;
+}
+.header:before,.header:after{
+  content:"✦";position:absolute;top:42px;color:#d7a94b;font-size:18px;
+  animation:sparkle 2s ease-in-out infinite;
+}
+.header:before{left:18%;}.header:after{right:18%;animation-delay:.7s}
+@keyframes sparkle{50%{opacity:.35;transform:scale(.75) rotate(15deg)}}
+.form-wrap{
+  background:linear-gradient(135deg,#fffaf0,#f7efe2);
+  box-shadow:inset 0 0 25px rgba(160,125,84,.06);
+}
+</style>
+</head>
+<body>
+<div id="snow"></div>
+
+<div class="wrapper">
+  <header class="header">
+    <div class="reindeer">🦌</div>
+    <h1>[ 러브레터 작성 도움! ]</h1>
+    <div class="subtitle">한 사람의 고백을, 모두의 문장으로 완성해 주세요.</div>
+    <div class="story-ornament">❧  ❄  ❧</div>
+  </header>
+
+  <main class="card letter">
+    <div class="letter-top">
+      <span>✦ A little help from everyone ✦</span>
+      <div class="stamp">❄<br><small>♥</small></div>
+    </div>
+
+    <div class="instructions">
+      <strong>이 러브레터는 혼자 쓰지 않습니다.</strong>
+      <p>앞사람의 문장을 읽고, 딱 한 문장만 이어 써 주세요.</p>
+    </div>
+
+    <section id="sentences" class="sentences">
+      <div class="empty" id="empty">아직 첫 문장이 없어요.<br>가장 먼저 마음을 적어 주세요 ☃</div>
+    </section>
+
+    <section class="form-wrap">
+      <h2 class="form-title">✉ 다음 문장을 적어 주세요</h2>
+      <input id="author" maxlength="20" placeholder="닉네임 (선택)">
+      <textarea id="sentence" maxlength="180" placeholder="앞의 문장에 이어질 한 문장을 써 주세요."></textarea>
+      <div class="submit-row">
+        <span class="counter"><span id="count">0</span> / 180</span>
+        <button id="submit">문장 보내기 ♥</button>
+      </div>
+      <div id="notice" class="notice"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    서로의 문장이 이어져 하나의 러브레터가 됩니다.
+    <div class="tree">✦ 🎄 ✦ 🎄 ✦</div>
+  </footer>
+</div>
+
+<script>
+/*
+  ============================================================
+  무료 배포용 릴레이 러브레터
+  ------------------------------------------------------------
+  1) 이 파일은 Firebase Realtime Database와 연결할 수 있습니다.
+  2) 아래 FIREBASE_CONFIG에 본인의 Firebase 설정을 넣으면
+     여러 사람이 같은 문장을 실시간으로 공유할 수 있습니다.
+  3) 설정하지 않으면 브라우저 localStorage를 이용한 '미리보기 모드'
+     로 동작합니다. (이 경우 다른 사람과 공유되지 않습니다.)
+  ============================================================
+*/
+const FIREBASE_CONFIG = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.firebasestorage.app",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+let useFirebase = false;
+let db = null;
+let firebaseReady = false;
+
+const sentencesEl = document.getElementById('sentences');
+const emptyEl = document.getElementById('empty');
+const authorEl = document.getElementById('author');
+const sentenceEl = document.getElementById('sentence');
+const submitEl = document.getElementById('submit');
+const noticeEl = document.getElementById('notice');
+const countEl = document.getElementById('count');
+
+sentenceEl.addEventListener('input',()=>countEl.textContent=sentenceEl.value.length);
+
+function showNotice(msg){
+  noticeEl.textContent=msg;
+  noticeEl.style.display='block';
+  clearTimeout(window.noticeTimer);
+  window.noticeTimer=setTimeout(()=>noticeEl.style.display='none',3500);
+}
+
+function render(items){
+  sentencesEl.innerHTML='';
+  if(!items.length){
+    sentencesEl.appendChild(emptyEl);
+    return;
+  }
+  items.forEach((item,i)=>{
+    const row=document.createElement('div');
+    row.className='line';
+    const num=document.createElement('div');
+    num.className='num'; num.textContent=i+1;
+    const text=document.createElement('div');
+    text.className='text';
+    text.textContent=item.text;
+    if(item.author){
+      const a=document.createElement('div');
+      a.className='author'; a.textContent='— '+item.author;
+      text.appendChild(a);
+    }
+    row.appendChild(num); row.appendChild(text); sentencesEl.appendChild(row);
+  });
+}
+
+function localItems(){
+  try{return JSON.parse(localStorage.getItem('relayLoveLetter')||'[]')}catch(e){return []}
+}
+function saveLocal(item){
+  const arr=localItems(); arr.push(item);
+  localStorage.setItem('relayLoveLetter',JSON.stringify(arr));
+  render(arr);
+}
+
+async function initFirebase(){
+  if(FIREBASE_CONFIG.apiKey.startsWith('YOUR_')) {
+    render(localItems());
+    return;
+  }
+  const s1=document.createElement('script');
+  s1.src='https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js';
+  const s2=document.createElement('script');
+  s2.src='https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js';
+  document.head.appendChild(s1); document.head.appendChild(s2);
+  await new Promise((resolve,reject)=>{
+    let n=0;
+    [s1,s2].forEach(s=>{s.onload=()=>{if(++n===2)resolve()};s.onerror=reject});
+  });
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db=firebase.database();
+    useFirebase=true;
+    firebaseReady=true;
+    db.ref('relayLoveLetter').on('value',snap=>{
+      const data=snap.val()||{};
+      const arr=Object.keys(data).map(k=>data[k]).sort((a,b)=>a.createdAt-b.createdAt);
+      render(arr);
+    });
+  }catch(e){
+    console.error(e);
+    render(localItems());
+    showNotice('공유 저장소 연결에 실패해 미리보기 모드로 전환했습니다.');
+  }
+}
+
+submitEl.addEventListener('click',async()=>{
+  const text=sentenceEl.value.trim();
+  const author=authorEl.value.trim();
+  if(!text){showNotice('이어 쓸 문장을 한 문장 적어 주세요!');sentenceEl.focus();return}
+  submitEl.disabled=true;
+  const item={text,author:author||'익명의 산타',createdAt:Date.now()};
+  try{
+    if(useFirebase && db){
+      await db.ref('relayLoveLetter').push(item);
+    }else{
+      saveLocal(item);
+    }
+    sentenceEl.value=''; authorEl.value=''; countEl.textContent='0';
+  }catch(e){
+    console.error(e);
+    showNotice('문장을 보내지 못했어요. 잠시 후 다시 시도해 주세요.');
+  }finally{submitEl.disabled=false}
+});
+
+initFirebase();
+
+/* 귀여운 눈 내리기 */
+const snowChars=['❄','✦','·','❅'];
+const snow=document.getElementById('snow');
+for(let i=0;i<34;i++){
+  const el=document.createElement('span');
+  el.className='snowflake';
+  el.textContent=snowChars[Math.floor(Math.random()*snowChars.length)];
+  el.style.left=Math.random()*100+'vw';
+  el.style.fontSize=(8+Math.random()*12)+'px';
+  el.style.animationDuration=(7+Math.random()*10)+'s';
+  el.style.animationDelay=(-Math.random()*15)+'s';
+  snow.appendChild(el);
+}
+</script>
+</body>
+</html>
