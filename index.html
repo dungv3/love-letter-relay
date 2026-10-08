@@ -123,6 +123,23 @@ button:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:0 3px 0 
   display:none;margin-top:12px;padding:9px 12px;border-radius:7px;
   background:#fff0ed;color:#9b5058;font-size:12px
 }
+
+.admin-link{margin-top:10px;padding:0;background:none;box-shadow:none;color:#9a8a7d;font:12px 'Gowun Dodum',sans-serif;text-decoration:underline;}
+.admin-link:hover{transform:none;box-shadow:none;color:var(--deep-red)}
+.admin-panel{display:none;position:fixed;inset:0;z-index:100;background:rgba(60,50,45,.38);align-items:center;justify-content:center;padding:18px}
+.admin-panel.open{display:flex}
+.admin-box{position:relative;width:min(390px,100%);background:#fffdf7;border:2px solid #e2d0b4;border-radius:16px;padding:28px 22px;box-shadow:0 20px 55px rgba(40,35,30,.25);text-align:center}
+.admin-box h3{font-family:'Gaegu';font-size:29px;color:var(--deep-red);margin:0 0 8px}
+.admin-help{font-size:12px;color:#8d8178;line-height:1.6;margin:0 0 15px}
+.admin-box input{display:block;width:100%;margin:8px 0;padding:11px 12px}
+.admin-box button:not(.admin-close){width:100%;margin-top:8px}
+.admin-close{position:absolute;right:10px;top:7px;border:0;background:none;color:#9b8b82;box-shadow:none;font:24px Arial;padding:5px;cursor:pointer}
+.admin-close:hover{transform:none;box-shadow:none}
+.admin-status{min-height:20px;margin-top:10px;font-size:12px;color:#8f3445}
+.admin-logout{background:#6f8175;box-shadow:0 4px 0 #53645a}
+.delete-btn{flex:0 0 auto;border:1px solid #d9b5ae;background:#fff5f3;color:#a14f59;box-shadow:none;padding:5px 9px;font:12px 'Gowun Dodum',sans-serif}
+.delete-btn:hover{transform:none;box-shadow:none;background:#fce7e3}
+@media(max-width:620px){.admin-box{padding:25px 16px}}
 @media(max-width:620px){
   .wrapper{width:calc(100% - 18px);padding-top:15px}
   .letter{padding:25px 18px 22px}
@@ -180,18 +197,34 @@ button:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:0 3px 0 
     <section class="form-wrap">
       <h2 class="form-title">✉ 다음 문장을 적어 주세요</h2>
       <input id="author" maxlength="20" placeholder="닉네임 (선택)">
-      <textarea id="sentence" maxlength="180" placeholder="앞의 문장에 이어질 한 문장을 써 주세요."></textarea>
+      <textarea id="sentence" maxlength="20" placeholder="앞의 문장에 이어질 한 문장을 써 주세요."></textarea>
       <div class="submit-row">
-        <span class="counter"><span id="count">0</span> / 180</span>
+        <span class="counter"><span id="count">0</span> / 20</span>
         <button id="submit">문장 보내기 ♥</button>
       </div>
       <div id="notice" class="notice"></div>
     </section>
   </main>
 
+  <div id="adminPanel" class="admin-panel" aria-hidden="true">
+    <div class="admin-box">
+      <button id="adminClose" class="admin-close" type="button" aria-label="닫기">×</button>
+      <h3>🔐 관리자</h3>
+      <p class="admin-help">관리자 계정으로 로그인하면 작성된 문장을 삭제할 수 있어요.</p>
+      <div id="loginForm">
+        <input id="adminEmail" type="email" placeholder="관리자 이메일" autocomplete="username">
+        <input id="adminPassword" type="password" placeholder="비밀번호" autocomplete="current-password">
+        <button id="adminLogin" type="button">로그인</button>
+      </div>
+      <div id="adminStatus" class="admin-status"></div>
+      <button id="adminLogout" class="admin-logout" type="button" style="display:none">로그아웃</button>
+    </div>
+  </div>
+
   <footer class="footer">
     서로의 문장이 이어져 하나의 러브레터가 됩니다.
     <div class="tree">✦ 🎄 ✦ 🎄 ✦</div>
+    <button id="adminOpen" class="admin-link" type="button">관리자</button>
   </footer>
 </div>
 
@@ -205,11 +238,13 @@ button:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:0 3px 0 
      여러 사람이 같은 문장을 실시간으로 공유할 수 있습니다.
   3) 설정하지 않으면 브라우저 localStorage를 이용한 '미리보기 모드'
      로 동작합니다. (이 경우 다른 사람과 공유되지 않습니다.)
+  4) 관리자 삭제 기능은 Firebase Authentication + Realtime Database Rules를 사용합니다.
   ============================================================
 */
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyA6iyzx4S9-45Oik12EnJXo2nsPnEo5nSI",
   authDomain: "love-letter-relay.firebaseapp.com",
+  databaseURL: "https://love-letter-relay-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "love-letter-relay",
   storageBucket: "love-letter-relay.firebasestorage.app",
   messagingSenderId: "145835628410",
@@ -217,9 +252,13 @@ const FIREBASE_CONFIG = {
   measurementId: "G-VQD5T8LJWC"
 };
 
+const ADMIN_UID = "sTDam2sOOwNr6WfvEC3nkiDqn0D2";
+
 let useFirebase = false;
 let db = null;
 let firebaseReady = false;
+let auth = null;
+let currentAdmin = false;
 
 const sentencesEl = document.getElementById('sentences');
 const emptyEl = document.getElementById('empty');
@@ -257,7 +296,14 @@ function render(items){
       a.className='author'; a.textContent='— '+item.author;
       text.appendChild(a);
     }
-    row.appendChild(num); row.appendChild(text); sentencesEl.appendChild(row);
+    row.appendChild(num); row.appendChild(text);
+    if(currentAdmin && item.key){
+      const del=document.createElement('button');
+      del.className='delete-btn'; del.type='button'; del.textContent='삭제';
+      del.addEventListener('click',()=>deleteSentence(item.key));
+      row.appendChild(del);
+    }
+    sentencesEl.appendChild(row);
   });
 }
 
@@ -279,19 +325,22 @@ async function initFirebase(){
   s1.src='https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js';
   const s2=document.createElement('script');
   s2.src='https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js';
-  document.head.appendChild(s1); document.head.appendChild(s2);
+  const s3=document.createElement('script');
+  s3.src='https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js';
+  document.head.appendChild(s1); document.head.appendChild(s2); document.head.appendChild(s3);
   await new Promise((resolve,reject)=>{
     let n=0;
-    [s1,s2].forEach(s=>{s.onload=()=>{if(++n===2)resolve()};s.onerror=reject});
+    [s1,s2,s3].forEach(s=>{s.onload=()=>{if(++n===3)resolve()};s.onerror=reject});
   });
   try{
     firebase.initializeApp(FIREBASE_CONFIG);
     db=firebase.database();
+    auth=firebase.auth();
     useFirebase=true;
     firebaseReady=true;
     db.ref('relayLoveLetter').on('value',snap=>{
       const data=snap.val()||{};
-      const arr=Object.keys(data).map(k=>data[k]).sort((a,b)=>a.createdAt-b.createdAt);
+      const arr=Object.keys(data).map(k=>({...data[k],key:k})).sort((a,b)=>a.createdAt-b.createdAt);
       render(arr);
     });
   }catch(e){
@@ -299,12 +348,14 @@ async function initFirebase(){
     render(localItems());
     showNotice('공유 저장소 연결에 실패해 미리보기 모드로 전환했습니다.');
   }
+  auth.onAuthStateChanged(updateAdminUI);
 }
 
 submitEl.addEventListener('click',async()=>{
   const text=sentenceEl.value.trim();
   const author=authorEl.value.trim();
   if(!text){showNotice('이어 쓸 문장을 한 문장 적어 주세요!');sentenceEl.focus();return}
+  if(text.length>20){showNotice('문장은 최대 20자까지 작성할 수 있어요.');sentenceEl.focus();return}
   submitEl.disabled=true;
   const item={text,author:author||'익명의 산타',createdAt:Date.now()};
   try{
@@ -319,6 +370,86 @@ submitEl.addEventListener('click',async()=>{
     showNotice('문장을 보내지 못했어요. 잠시 후 다시 시도해 주세요.');
   }finally{submitEl.disabled=false}
 });
+
+// 관리자 로그인 / 삭제
+const adminOpen=document.getElementById('adminOpen');
+const adminPanel=document.getElementById('adminPanel');
+const adminClose=document.getElementById('adminClose');
+const adminEmail=document.getElementById('adminEmail');
+const adminPassword=document.getElementById('adminPassword');
+const adminLogin=document.getElementById('adminLogin');
+const adminStatus=document.getElementById('adminStatus');
+const adminLogout=document.getElementById('adminLogout');
+
+function updateAdminUI(user){
+  currentAdmin=!!(user && ADMIN_UID!=='PUT_ADMIN_UID_HERE' && user.uid===ADMIN_UID);
+  if(currentAdmin){
+    adminStatus.textContent='관리자로 로그인되었습니다. 아래 문장 옆에 삭제 버튼이 나타납니다.';
+    adminLogin.style.display='none';
+    adminEmail.style.display='none';
+    adminPassword.style.display='none';
+    adminLogout.style.display='block';
+  }else if(user){
+    adminStatus.textContent='로그인은 되었지만 관리자 권한이 없습니다.';
+    adminLogin.style.display='none';
+    adminEmail.style.display='none';
+    adminPassword.style.display='none';
+    adminLogout.style.display='block';
+  }else{
+    currentAdmin=false;
+    adminStatus.textContent='';
+    adminLogin.style.display='block';
+    adminEmail.style.display='block';
+    adminPassword.style.display='block';
+    adminLogout.style.display='none';
+  }
+  if(useFirebase && db){
+    db.ref('relayLoveLetter').once('value').then(snap=>{
+      const data=snap.val()||{};
+      render(Object.keys(data).map(k=>({...data[k],key:k})).sort((a,b)=>a.createdAt-b.createdAt));
+    });
+  }
+}
+
+adminOpen.addEventListener('click',()=>{
+  adminPanel.classList.add('open');
+  adminPanel.setAttribute('aria-hidden','false');
+});
+adminClose.addEventListener('click',()=>{
+  adminPanel.classList.remove('open');
+  adminPanel.setAttribute('aria-hidden','true');
+});
+adminPanel.addEventListener('click',e=>{if(e.target===adminPanel) adminClose.click()});
+
+adminLogin.addEventListener('click',async()=>{
+  if(!auth){adminStatus.textContent='Firebase가 아직 연결되지 않았습니다.';return}
+  const email=adminEmail.value.trim();
+  const password=adminPassword.value;
+  if(!email || !password){adminStatus.textContent='이메일과 비밀번호를 입력해 주세요.';return}
+  adminLogin.disabled=true;
+  try{
+    await auth.signInWithEmailAndPassword(email,password);
+  }catch(e){
+    console.error(e);
+    adminStatus.textContent='로그인에 실패했습니다. 이메일/비밀번호를 확인해 주세요.';
+  }finally{adminLogin.disabled=false}
+});
+
+adminLogout.addEventListener('click',async()=>{
+  if(auth) await auth.signOut();
+});
+
+async function deleteSentence(key){
+  if(!currentAdmin || !db || !key) return;
+  if(!confirm('이 문장을 정말 삭제할까요?')) return;
+  try{
+    await db.ref('relayLoveLetter/'+key).remove();
+    showNotice('문장을 삭제했습니다.');
+  }catch(e){
+    console.error(e);
+    showNotice('삭제 권한이 없거나 삭제에 실패했습니다.');
+  }
+}
 
 initFirebase();
 
