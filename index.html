@@ -196,7 +196,7 @@ button:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:0 3px 0 
 
     <section class="form-wrap">
       <h2 class="form-title">✉ 다음 문장을 적어 주세요</h2>
-      <input id="author" maxlength="20" placeholder="닉네임 (선택)">
+      <input id="author" maxlength="120" placeholder="닉네임 (선택)">
       <textarea id="sentence" maxlength="120" placeholder="앞의 문장에 이어질 한 문장을 써 주세요."></textarea>
       <div class="submit-row">
         <span class="counter"><span id="count">0</span> / 120</span>
@@ -355,7 +355,7 @@ submitEl.addEventListener('click',async()=>{
   const text=sentenceEl.value.trim();
   const author=authorEl.value.trim();
   if(!text){showNotice('이어 쓸 문장을 한 문장 적어 주세요!');sentenceEl.focus();return}
-  if(text.length>20){showNotice('문장은 최대 20자까지 작성할 수 있어요.');sentenceEl.focus();return}
+  if(text.length>120){showNotice('문장은 최대 120자까지 작성할 수 있어요.');sentenceEl.focus();return}
   submitEl.disabled=true;
   const item={text,author:author||'익명의 산타',createdAt:Date.now()};
   try{
